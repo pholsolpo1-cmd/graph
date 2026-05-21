@@ -28,7 +28,7 @@
 ## Структура проекта
 - `index.html` — основной файл презентации
 - `markdown/` — содержимое слайдов в формате Markdown
-- `dist/` — локальные файлы фреймворка Reveal.js и Leaflet
+- `dist/` — локальные файлы фреймворка Reveal.js,Leaflet и KaTeX
 - `plugin/` — плагины Reveal.js (menu, markdown, highlight, notes, zoom)
 - `csv/cities.js` — база данных городов России
 - `img/` — изображения для слайдов
