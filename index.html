@@ -1,0 +1,322 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Теория графов</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/custom-theme.css" id="theme">
+		<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+		<link rel="stylesheet" href="dist/leaflet/leaflet.css">
+		
+		<style>
+	
+			.leaflet-control-attribution,
+			.leaflet-bottom.leaflet-right {
+				display: none !important;
+			}
+
+		
+			.reveal .slides section,
+			.reveal p,
+			.reveal li,
+			.reveal ul,
+			.reveal ol,
+			.reveal blockquote,
+			.reveal table,
+			.reveal pre,
+			.reveal code {
+				font-size: 24px !important;
+				line-height: 1.6 !important;
+			}
+
+	
+			.reveal h1 { font-size: 2.5em !important; line-height: 1.3 !important; }
+			.reveal h2 { font-size: 2.0em !important; line-height: 1.4 !important; }
+			.reveal h3 { font-size: 1.6em !important; line-height: 1.4 !important; }
+			.reveal h4 { font-size: 1.3em !important; }
+
+	
+			.reveal ul, .reveal ol { margin: 0 0 16px 0; padding-left: 30px; }
+			.reveal li { margin: 6px 0; }
+
+		
+			.reveal .slides section { overflow: hidden; }
+
+	
+			#map, #orthodrome-map { 
+				height: 300px; 
+				width: 85%; 
+				border-radius: 0; 
+				margin: 0;
+			}
+
+		
+			#orthodrome-info {
+				margin-top: 20px;
+				padding: 15px;
+				background: #e8eaf6;
+				border-radius: 8px;
+				font-size: 24px !important;
+				line-height: 1.6 !important;
+			}
+			#city1, #city2 { padding: 8px; margin: 5px; font-size: 20px; min-width: 220px; }
+			button { padding: 8px 20px; margin: 5px; font-size: 20px; border: none; border-radius: 4px; cursor: pointer; }
+			button.primary { background: #1565c0; color: white; }
+			button.danger { background: #d32f2f; color: white; }
+		</style>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				
+				<section class="center">
+					<h1>Теория графов</h1>
+					<p><small>Применение в географии и анализе данных</small></p>
+				</section>
+				
+				
+				<section class="center">
+					<h2>Раздел 1: Введение</h2>
+				</section>
+				<section data-markdown="markdown/02-graph-definition.md"></section>
+				<section data-markdown="markdown/03-graph-elements.md"></section>
+				<section data-markdown="markdown/04-graph-types.md"></section>
+				<section data-markdown="markdown/konigsberg.md" data-menu-title="Задача о 7 мостах"></section>
+				
+			
+				<section class="center">
+					<h2>Раздел 2: Алгоритмы</h2>
+				</section>
+				<section data-markdown="markdown/05-bfs-dfs.md"></section>
+				<section data-markdown="markdown/06-dijkstra.md"></section>
+				<section data-markdown="markdown/07-graph-properties.md"></section>
+				<section data-markdown="markdown/08-graph-representation.md"></section>
+				
+				
+				<section class="center">
+					<h2>Раздел 3: Графы в географии</h2>
+				</section>
+				<section data-markdown="markdown/09-geographical-graphs.md"></section>
+				
+				
+			
+				<section class="center">
+					<h2>Раздел 4: Визуализация</h2>
+				</section>
+					<section data-menu-title="Схема графа" data-background-image="img/graph-scheme.png" data-background-size="55%"></section>
+					<section data-menu-title="Транспортная сеть" data-background-image="img/map-example.png" data-background-size="55%"></section>
+					<section data-menu-title="Анализ связей" data-background-image="img/chart.jpg" data-background-size="55%"></section>
+				
+				
+			
+				<section class="center">
+					<h2>Раздел 5: Применение</h2>
+				</section>
+				<section data-markdown="markdown/10-graph-applications.md"></section>
+				<section data-markdown="markdown/11-network-analysis.md"></section>
+				
+				
+				<section id="orthodrome-slide" data-menu-title="Построение маршрута">
+					<h3>Построение прямого маршрута</h3>
+					<div style="margin: 10px 0;">
+						<select id="city1"><option value="">Выберите первый город</option></select>
+						<select id="city2"><option value="">Выберите второй город</option></select>
+						<button class="primary" onclick="drawRoute()">Построить</button>
+					</div>
+					<div id="orthodrome-map"></div>
+					<div style="text-align:center;margin-top:10px;font-size:20px;color:#1565c0;" id="route-distance"></div>
+				</section>
+				
+				<section id="code-slide" data-menu-title="Исходный код">
+    		<h3>Фрагмент реализации</h3>
+    <section id="code-slide" data-menu-title="Исходный код">
+    <h3 style="margin-bottom: 12px;">Фрагмент реализации</h3>
+    <pre style="background: #2d2d2d; color: #f8f8f2; padding: 12px; border-radius: 6px; overflow: hidden; max-height: 420px;">
+<code style="font-size: 14px !important; line-height: 1.25 !important; white-space: pre;">
+function calculateOrthodromeRoute(startLat, startLon, endLat, endLon, numPoints = 100) {
+    const points = [], earthRadiusKm = 6371;
+    const lat1Rad = startLat * Math.PI / 180;
+    const lon1Rad = startLon * Math.PI / 180;
+    const lat2Rad = endLat * Math.PI / 180;
+    const lon2Rad = endLon * Math.PI / 180;
+    const deltaLat = lat2Rad - lat1Rad;
+    const deltaLon = lon2Rad - lon1Rad;
+    const a = Math.sin(deltaLat / 2) ** 2 + Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(deltaLon / 2) ** 2;
+    const angularDistance = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distanceKm = earthRadiusKm * angularDistance;
+    for (let i = 0; i <= numPoints; i++) {
+        const f = i / numPoints;
+        const A = Math.sin((1 - f) * angularDistance) / Math.sin(angularDistance);
+        const B = Math.sin(f * angularDistance) / Math.sin(angularDistance);
+        const x = A * Math.cos(lat1Rad) * Math.cos(lon1Rad) + B * Math.cos(lat2Rad) * Math.cos(lon2Rad);
+        const y = A * Math.cos(lat1Rad) * Math.sin(lon1Rad) + B * Math.cos(lat2Rad) * Math.sin(lon2Rad);
+        const z = A * Math.sin(lat1Rad) + B * Math.sin(lat2Rad);
+        points.push([Math.atan2(z, Math.sqrt(x * x + y * y)) * 180 / Math.PI, Math.atan2(y, x) * 180 / Math.PI]);
+    }
+    return { points, distance: distanceKm };
+}
+</code></pre>
+</section>
+</section>
+				<section class="center" data-menu-title="Заключение">
+					<h2>Спасибо за внимание!</h2>
+					<p>Вопросы?</p>
+				</section>
+			</div>
+		</div>
+
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="plugin/menu/menu.js"></script>
+		<script src="plugin/zoom/zoom.js"></script>
+		<script src="dist/leaflet/leaflet.js"></script>
+		<script src="csv/cities.js"></script>
+
+		<script>
+	
+			Reveal.initialize({
+				hash: true,
+				slideNumber: 'c',
+				controls: true,
+				center: true,
+				progress: true,
+				dependencies: [{
+					src: 'plugin/menu/menu.js',
+					async: true,
+				}],
+				menu: {
+					numbers: true,
+					markers: true,
+					loadIcons: false
+				},
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealMenu, RevealZoom ]
+			});
+
+		
+			function calculateDistance(startLat, startLon, endLat, endLon) {
+				const earthRadiusKm = 6371;
+				const lat1Rad = startLat * Math.PI / 180;
+				const lat2Rad = endLat * Math.PI / 180;
+				const deltaLat = (endLat - startLat) * Math.PI / 180;
+				const deltaLon = (endLon - startLon) * Math.PI / 180;
+
+				const formulaValue = Math.sin(deltaLat / 2) ** 2 + 
+					Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(deltaLon / 2) ** 2;
+
+				return earthRadiusKm * 2 * Math.atan2(Math.sqrt(formulaValue), Math.sqrt(1 - formulaValue));
+			}
+			let routeMap = null, routeLine = null, routeMarkers = [];
+			
+			function initCitySelectors() {
+				const select1 = document.getElementById('city1');
+				const select2 = document.getElementById('city2');
+				if (!select1 || !select2 || typeof cities === 'undefined') return;
+				
+				while (select1.options.length > 1) select1.remove(1);
+				while (select2.options.length > 1) select2.remove(1);
+				
+				cities.forEach((city, index) => {
+					const option1 = document.createElement('option');
+					option1.value = index;
+					option1.textContent = `${city.city}, ${city.region}`;
+					select1.appendChild(option1);
+					
+					const option2 = document.createElement('option');
+					option2.value = index;
+					option2.textContent = `${city.city}, ${city.region}`;
+					select2.appendChild(option2);
+				});
+			}
+			
+		
+			function calculateOrthodromeRoute(startLat, startLon, endLat, endLon, numPoints = 100) {
+				const points = [];
+				const earthRadiusKm = 6371;
+
+				const lat1Rad = startLat * Math.PI / 180;
+				const lon1Rad = startLon * Math.PI / 180;
+				const lat2Rad = endLat * Math.PI / 180;
+				const lon2Rad = endLon * Math.PI / 180;
+
+				const deltaLat = lat2Rad - lat1Rad;
+				const deltaLon = lon2Rad - lon1Rad;
+				const a = Math.sin(deltaLat / 2) ** 2 + Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(deltaLon / 2) ** 2;
+				const angularDistance = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+				const distanceKm = earthRadiusKm * angularDistance;
+
+				for (let i = 0; i <= numPoints; i++) {
+					const fraction = i / numPoints;
+					const A = Math.sin((1 - fraction) * angularDistance) / Math.sin(angularDistance);
+					const B = Math.sin(fraction * angularDistance) / Math.sin(angularDistance);
+
+					const x = A * Math.cos(lat1Rad) * Math.cos(lon1Rad) + B * Math.cos(lat2Rad) * Math.cos(lon2Rad);
+					const y = A * Math.cos(lat1Rad) * Math.sin(lon1Rad) + B * Math.cos(lat2Rad) * Math.sin(lon2Rad);
+					const z = A * Math.sin(lat1Rad) + B * Math.sin(lat2Rad);
+
+					const pointLat = Math.atan2(z, Math.sqrt(x * x + y * y)) * 180 / Math.PI;
+					const pointLon = Math.atan2(y, x) * 180 / Math.PI;
+					points.push([pointLat, pointLon]);
+				}
+
+				return { points, distance: distanceKm };
+			}
+			
+			function drawRoute() {
+				const index1 = document.getElementById('city1').value;
+				const index2 = document.getElementById('city2').value;
+				
+				if (index1 === '' || index2 === '' || index1 === index2) {
+					return;
+				}
+				
+				const city1 = cities[index1];
+				const city2 = cities[index2];
+				const { points, distance } = calculateOrthodromeRoute(+city1.latitude, +city1.longitude, +city2.latitude, +city2.longitude);
+				
+				if (!routeMap) {
+					routeMap = L.map('orthodrome-map', { attributionControl: false }).setView([55.75, 37.62], 4);
+					L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+						attribution: '',
+						maxZoom: 10
+					}).addTo(routeMap);
+				}
+				
+				if (routeLine) routeMap.removeLayer(routeLine);
+				routeMarkers.forEach(marker => routeMap.removeLayer(marker));
+				routeMarkers = [];
+				
+				routeMarkers.push(L.marker([+city1.latitude, +city1.longitude]).bindPopup(`<b>${city1.city}</b><br>${city1.region}`).addTo(routeMap));
+				routeMarkers.push(L.marker([+city2.latitude, +city2.longitude]).bindPopup(`<b>${city2.city}</b><br>${city2.region}`).addTo(routeMap));
+				
+				
+				routeLine = L.polyline(points, {
+					color: '#d32f2f', weight: 3, opacity: 0.8
+				}).addTo(routeMap);
+				
+				
+				routeMap.fitBounds(routeLine.getBounds());
+				document.getElementById('route-distance').textContent = `Расстояние: ${distance.toFixed(2)} км`;
+			}
+			
+			function clearRoute() {
+				document.getElementById('city1').value = '';
+				document.getElementById('city2').value = '';
+				if (routeLine) { routeMap.removeLayer(routeLine); routeLine = null; }
+				routeMarkers.forEach(marker => routeMap.removeLayer(marker));
+				routeMarkers = [];
+			}
+
+			
+			Reveal.on('slidechanged', event => {
+				if (event.currentSlide.id === 'orthodrome-slide') setTimeout(initCitySelectors, 100);
+			});
+		</script>
+	</body>
+</html>
