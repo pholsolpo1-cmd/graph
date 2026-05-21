@@ -11,6 +11,7 @@
 		<link rel="stylesheet" href="dist/theme/custom-theme.css" id="theme">
 		<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
 		<link rel="stylesheet" href="dist/leaflet/leaflet.css">
+		<link rel="stylesheet" href="plugin/katex/katex.min.css">
 		
 		<style>
 	
@@ -18,8 +19,6 @@
 			.leaflet-bottom.leaflet-right {
 				display: none !important;
 			}
-
-		
 			.reveal .slides section,
 			.reveal p,
 			.reveal li,
@@ -181,23 +180,40 @@ function calculateOrthodromeRoute(startLat, startLon, endLat, endLon, numPoints 
 
 		<script>
 	
-			Reveal.initialize({
-				hash: true,
-				slideNumber: 'c',
-				controls: true,
-				center: true,
-				progress: true,
-				dependencies: [{
-					src: 'plugin/menu/menu.js',
-					async: true,
-				}],
-				menu: {
-					numbers: true,
-					markers: true,
-					loadIcons: false
-				},
-				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealMenu, RevealZoom ]
-			});
+		Reveal.initialize({
+			hash: true,
+			slideNumber: true,
+			controls: true,
+			center: true,
+			progress: true,
+			dependencies: [{
+				src: 'plugin/katex/katex.js',
+				async: true,
+			}, 
+			{
+            src: 'plugin/katex/auto-render.min.js',
+            async: true,
+            callback: function() {
+                
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: "$$", right: "$$", display: true},
+                        {left: "$", right: "$", display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        },{
+				src: 'plugin/menu/menu.js',
+				async: true,
+			}],
+			menu: {
+				numbers: true,
+				markers: true,
+				loadIcons: false
+			},
+			plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealMenu, RevealZoom ]
+		});
 
 		
 			function calculateDistance(startLat, startLon, endLat, endLon) {
